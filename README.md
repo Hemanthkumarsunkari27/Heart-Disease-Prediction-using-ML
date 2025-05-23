@@ -47,11 +47,17 @@ This project is a web-based application that predicts the risk of heart disease 
 │
 
 ├── model.pkl # Trained ML model
+
 ├── app.py # Flask/FastAPI backend
+
 ├── templates/
+
 │ └── index.html # Bootstrap-based form
+
 ├── static/
+
 │ └── style.css # Custom styles and animations
+
 └── README.md # Project overview
 
 
