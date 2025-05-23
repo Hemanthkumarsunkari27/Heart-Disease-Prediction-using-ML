@@ -45,14 +45,23 @@ This project is a web-based application that predicts the risk of heart disease 
 
 HeartDisease/
 │
+
 ├── app.py                  # Flask/FastAPI backend script
+
 ├── model.pkl               # Trained ML model
+
 ├── scaler.pkl              # Preprocessing scaler (if used)
+
 ├── heart_disease.csv       # Dataset (optional)
+
 ├── model.ipynb             # Jupyter notebook for training/modeling
+
 │
+
 ├── templates/              # Flask templates folder for HTML files
+
 │   └── index.html          # Main HTML form page
+
 │
 └── requirements.txt        # Python dependencies list (optional but recommended)
 
