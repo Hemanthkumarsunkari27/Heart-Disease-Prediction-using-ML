@@ -70,7 +70,7 @@ This project is a web-based application that predicts the risk of heart disease 
 
 ## 📊 Model Info
 
-- Algorithm used: (e.g., Logistic Regression, Random Forest, etc.)
+- Algorithms used: (e.g., Logistic Regression, Random Forest, K-Nearest Neighbors, Linear Regression, Decision Tree, Random Forest etc.)
 - Trained on: Synthetic Heart Disease Dataset with 10,000 records
 
 ## 📌 Future Scope
