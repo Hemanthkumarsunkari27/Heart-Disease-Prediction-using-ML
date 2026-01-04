@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><i class="fas fa-heart"></i> Heart Disease Prediction</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      background: lightcoral; /* light pink */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 15px;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .form-container {
+      background: lightpink;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(14, 14, 14, 0.12);
+      max-width: 900px;
+      width: 100%;
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .form-label i {
+      margin-right: 8px;
+      color: #e4115b; /* bootstrap pink-ish */
+    }
+    h2 {
+      color: #ea0b59;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 30px;
+      user-select: none;
+    }
+    #predictionResult {
+      margin-top: 30px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-align: center;
+      user-select: none;
+    }
+    /* Chart container margin */
+    #chartContainer {
+      margin-top: 40px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @keyframes beat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+}
+
+.beating-heart {
+  color: #e4115b;
+  animation: beat 1s infinite;
+  display: inline-block;
+}
+
+  </style>
+</head>
+<body>
+  <div class="form-container shadow-sm rounded">
+    <h2>
+      <i class="fas fa-heart beating-heart"></i> Heart Disease Prediction
+    </h2>
+
+    <form id="heartForm" novalidate>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="age" class="form-label"
+            ><i class="fas fa-user-clock"></i> Age
+            <small class="text-muted">(18–100)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="age"
+            name="age"
+            min="18"
+            max="100"
+            data-bs-toggle="tooltip"
+            title="Your age in years"
+            required
+          />
+          <div class="invalid-feedback">Please enter age between 18 and 100.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label for="gender" class="form-label"
+            ><i class="fas fa-venus-mars"></i> Gender
+            <small class="text-muted">(0 = Female, 1 = Male)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="gender"
+            name="gender"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="Enter 0 for Female, 1 for Male"
+            required
+          />
+          <div class="invalid-feedback">Please enter 0 (Female) or 1 (Male).</div>
+        </div>
+
+        <!-- Blood Pressure -->
+        <div class="col-md-6">
+          <label for="bp" class="form-label"
+            ><i class="fas fa-heartbeat"></i> Blood Pressure
+            <small class="text-muted">(Normal: 90/60 - 120/80 mmHg)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="bp"
+            name="bp"
+            min="60"
+            max="200"
+            data-bs-toggle="tooltip"
+            title="Enter your systolic blood pressure"
+            required
+          />
+          <div class="invalid-feedback">Enter a valid blood pressure value.</div>
+        </div>
+
+        <!-- Cholesterol -->
+        <div class="col-md-6">
+          <label for="chol" class="form-label"
+            ><i class="fas fa-vial"></i> Cholesterol Level
+            <small class="text-muted">(Below 200 mg/dL is desirable)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="chol"
+            name="chol"
+            min="100"
+            max="400"
+            data-bs-toggle="tooltip"
+            title="Cholesterol level in mg/dL"
+            required
+          />
+          <div class="invalid-feedback">Enter your cholesterol level.</div>
+        </div>
+
+        <!-- Exercise Habits -->
+        <div class="col-md-6">
+          <label for="exercise" class="form-label"
+            ><i class="fas fa-dumbbell"></i> Exercise Habits
+            <small class="text-muted">(0=High, 1=Low)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="exercise"
+            name="exercise"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 for High, 1 for Low exercise habits"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- Smoking -->
+        <div class="col-md-6">
+          <label for="smoking" class="form-label"
+            ><i class="fas fa-smoking"></i> Smoking
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="smoking"
+            name="smoking"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- Family History -->
+        <div class="col-md-6">
+          <label for="family" class="form-label"
+            ><i class="fas fa-users"></i> Family History
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="family"
+            name="family"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- Diabetes -->
+        <div class="col-md-6">
+          <label for="diabetes" class="form-label"
+            ><i class="fas fa-syringe"></i> Diabetes
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="diabetes"
+            name="diabetes"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- BMI -->
+        <div class="col-md-6">
+          <label for="bmi" class="form-label"
+            ><i class="fas fa-weight"></i> BMI
+            <small class="text-muted">(Healthy: 18.5 - 24.9)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="bmi"
+            name="bmi"
+            step="0.1"
+            min="10"
+            max="50"
+            data-bs-toggle="tooltip"
+            title="Body Mass Index"
+            required
+          />
+          <div class="invalid-feedback">Enter your BMI.</div>
+        </div>
+
+        <!-- High Blood Pressure -->
+        <div class="col-md-6">
+          <label for="highbp" class="form-label"
+            ><i class="fas fa-tachometer-alt"></i> High Blood Pressure
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="highbp"
+            name="highbp"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- Low HDL Cholesterol -->
+        <div class="col-md-6">
+          <label for="lowhdl" class="form-label"
+            ><i class="fas fa-heart-circle-exclamation"></i> Low HDL Cholesterol
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="lowhdl"
+            name="lowhdl"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- High LDL Cholesterol -->
+        <div class="col-md-6">
+          <label for="highldl" class="form-label"
+            ><i class="fas fa-heart-circle-exclamation"></i> High LDL Cholesterol
+            <small class="text-muted">(0=No, 1=Yes)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="highldl"
+            name="highldl"
+            min="0"
+            max="1"
+            data-bs-toggle="tooltip"
+            title="0 = No, 1 = Yes"
+            required
+          />
+          <div class="invalid-feedback">Enter 0 or 1.</div>
+        </div>
+
+        <!-- Alcohol Consumption -->
+        <div class="col-md-6">
+          <label for="alcohol" class="form-label"
+            ><i class="fas fa-wine-glass-alt"></i> Alcohol Consumption
+            <small class="text-muted">(0=High,1=Low,2=Medium)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="alcohol"
+            name="alcohol"
+            min="0"
+            max="2"
+            data-bs-toggle="tooltip"
+            title="0=High,1=Low,2=Medium"
+            required
+          />
+          <div class="invalid-feedback">Enter 0, 1, or 2.</div>
+        </div>
+
+        <!-- Stress Level -->
+        <div class="col-md-6">
+          <label for="stress" class="form-label"
+            ><i class="fas fa-brain"></i> Stress Level
+            <small class="text-muted">(0=High,1=Low,2=Medium)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="stress"
+            name="stress"
+            min="0"
+            max="2"
+            data-bs-toggle="tooltip"
+            title="0=High,1=Low,2=Medium"
+            required
+          />
+          <div class="invalid-feedback">Enter 0, 1, or 2.</div>
+        </div>
+
+        <!-- Sleep Hours -->
+        <div class="col-md-6">
+          <label for="sleep" class="form-label"
+            ><i class="fas fa-bed"></i> Sleep Hours
+            <small class="text-muted">(Recommended 7–9 hours)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="sleep"
+            name="sleep"
+            min="0"
+            max="24"
+            data-bs-toggle="tooltip"
+            title="Hours of sleep"
+            required
+          />
+          <div class="invalid-feedback">Enter sleep hours between 0 and 24.</div>
+        </div>
+
+        <!-- Sugar Consumption -->
+        <div class="col-md-6">
+          <label for="sugar" class="form-label"
+            ><i class="fas fa-candy-cane"></i> Sugar Consumption
+            <small class="text-muted">(0=High,1=Low,2=Medium)</small></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="sugar"
+            name="sugar"
+            min="0"
+            max="2"
+            data-bs-toggle="tooltip"
+            title="0=High,1=Low,2=Medium"
+            required
+          />
+          <div class="invalid-feedback">Enter 0, 1, or 2.</div>
+        </div>
+
+        <!-- Triglyceride Level -->
+        <div class="col-md-6">
+          <label for="triglyceride" class="form-label"
+            ><i class="fas fa-flask"></i> Triglyceride Level (mg/dL)</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="triglyceride"
+            name="triglyceride"
+            min="10"
+            max="500"
+            data-bs-toggle="tooltip"
+            title="Triglyceride level in mg/dL"
+            required
+          />
+          <div class="invalid-feedback">Enter a valid triglyceride level.</div>
+        </div>
+
+        <!-- Fasting Blood Sugar -->
+        <div class="col-md-6">
+          <label for="fastingbs" class="form-label"
+            ><i class="fas fa-tint"></i> Fasting Blood Sugar (mg/dL)</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="fastingbs"
+            name="fastingbs"
+            min="40"
+            max="400"
+            data-bs-toggle="tooltip"
+            title="Fasting blood sugar level"
+            required
+          />
+          <div class="invalid-feedback">Enter a valid fasting blood sugar.</div>
+        </div>
+
+        <!-- CRP Level -->
+        <div class="col-md-6">
+          <label for="crp" class="form-label"
+            ><i class="fas fa-vial"></i> CRP Level (mg/L)</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="crp"
+            name="crp"
+            min="0"
+            max="20"
+            step="0.1"
+            data-bs-toggle="tooltip"
+            title="C-reactive protein level"
+            required
+          />
+          <div class="invalid-feedback">Enter a valid CRP level.</div>
+        </div>
+
+        <!-- Homocysteine Level -->
+        <div class="col-md-6">
+          <label for="homocysteine" class="form-label"
+            ><i class="fas fa-flask"></i> Homocysteine Level (µmol/L)</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="homocysteine"
+            name="homocysteine"
+            min="2"
+            max="50"
+            step="0.1"
+            data-bs-toggle="tooltip"
+            title="Homocysteine level"
+            required
+          />
+          <div class="invalid-feedback">Enter a valid homocysteine level.</div>
+        </div>
+      </div>
+
+      <div class="d-grid mt-4">
+        <button type="submit" class="btn btn-danger btn-lg">
+          Predict
+        </button>
+      </div>
+    </form>
+
+    <div id="predictionResult"></div>
+
+    <div id="chartContainer">
+      <canvas id="summaryChart"></canvas>
+    </div>
+  </div>
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Enable Bootstrap tooltips
+    const tooltipTriggerList = document.querySelectorAll(
+      '[data-bs-toggle="tooltip"]'
+    );
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+      new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Form validation & prediction logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("heartForm");
+      const resultDiv = document.getElementById("predictionResult");
+      const ctx = document.getElementById("summaryChart").getContext("2d");
+
+      // Initialize Chart.js chart instance variable
+      let summaryChart;
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+          e.stopPropagation();
+          form.classList.add("was-validated");
+          return;
+        }
+
+        form.classList.remove("was-validated");
+
+        // Extract all inputs as numbers
+        const data = {
+          age: Number(form.age.value),
+          gender: Number(form.gender.value),
+          bp: Number(form.bp.value),
+          chol: Number(form.chol.value),
+          exercise: Number(form.exercise.value),
+          smoking: Number(form.smoking.value),
+          family: Number(form.family.value),
+          diabetes: Number(form.diabetes.value),
+          bmi: Number(form.bmi.value),
+          highbp: Number(form.highbp.value),
+          lowhdl: Number(form.lowhdl.value),
+          highldl: Number(form.highldl.value),
+          alcohol: Number(form.alcohol.value),
+          stress: Number(form.stress.value),
+          sleep: Number(form.sleep.value),
+          sugar: Number(form.sugar.value),
+          triglyceride: Number(form.triglyceride.value),
+          fastingbs: Number(form.fastingbs.value),
+          crp: Number(form.crp.value),
+          homocysteine: Number(form.homocysteine.value),
+        };
+
+        // Simple mock prediction logic (replace with your real ML model or API)
+        let riskScore = 0;
+
+        // Simple heuristic for demo only:
+        riskScore += data.age > 60 ? 2 : 0;
+        riskScore += data.bp > 140 ? 2 : 0;
+        riskScore += data.chol > 240 ? 2 : 0;
+        riskScore += data.smoking === 1 ? 2 : 0;
+        riskScore += data.diabetes === 1 ? 2 : 0;
+        riskScore += data.bmi > 30 ? 1 : 0;
+        riskScore += data.highbp === 1 ? 1 : 0;
+        riskScore += data.lowhdl === 1 ? 1 : 0;
+        riskScore += data.highldl === 1 ? 1 : 0;
+        riskScore += data.stress === 0 ? 1 : 0;
+        riskScore += data.sleep < 6 ? 1 : 0;
+        riskScore += data.alcohol === 0 ? 1 : 0;
+
+        let predictionText = "";
+        if (riskScore >= 7) {
+          predictionText = "High risk of heart disease";
+          resultDiv.style.color = "red";
+        } else if (riskScore >= 4) {
+          predictionText = "Moderate risk of heart disease";
+          resultDiv.style.color = "orange";
+        } else {
+          predictionText = "Low risk of heart disease";
+          resultDiv.style.color = "green";
+        }
+
+        resultDiv.textContent = `Prediction result: ${predictionText}`;
+
+        // Show a summary chart of few key parameters
+        const chartData = {
+          labels: [
+            "Age",
+            "Blood Pressure",
+            "Cholesterol",
+            "BMI",
+            "Stress Level",
+            "Sleep Hours",
+          ],
+          datasets: [
+            {
+              label: "Values",
+              data: [
+                data.age,
+                data.bp,
+                data.chol,
+                data.bmi,
+                data.stress === 0 ? 3 : data.stress === 1 ? 1 : 2,
+                data.sleep,
+              ],
+              backgroundColor: [
+                "rgba(214, 51, 108, 0.7)",
+                "rgba(255, 99, 132, 0.7)",
+                "rgba(255, 159, 64, 0.7)",
+                "rgba(255, 205, 86, 0.7)",
+                "rgba(75, 192, 192, 0.7)",
+                "rgba(54, 162, 235, 0.7)",
+              ],
+              borderColor: [
+                "rgba(214, 51, 108, 1)",
+                "rgba(255, 99, 132, 1)",
+                "rgba(255, 159, 64, 1)",
+                "rgba(255, 205, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(54, 162, 235, 1)",
+              ],
+              borderWidth: 1,
+            },
+          ],
+        };
+
+        if (summaryChart) {
+          summaryChart.destroy();
+        }
+
+        summaryChart = new Chart(ctx, {
+          type: "bar",
+          data: chartData,
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+              },
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                enabled: true,
+              },
+            },
+          },
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
